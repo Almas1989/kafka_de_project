@@ -1,12 +1,51 @@
-# Примеры использования Kafka
+# 🎵 Платформа Аналитики Музыкального Стриминга
 
-Как собирать, хранить и анализировать данные событий (clickstream) с помощью
-Kafka, Python, S3 (MinIO) и ClickHouse.
+Конвейер обработки событий в реальном времени для музыкального сервиса с использованием Kafka, Python, S3 (MinIO) и ClickHouse.
 
+## 📋 Описание Проекта
 
-## Настройка проекта
+Этот проект демонстрирует полный data engineering pipeline для сбора, хранения и анализа данных о действиях пользователей музыкальной платформы. Проект показывает современные паттерны event-driven архитектуры и обработки данных в реальном времени.
 
-### Создание виртуального окружения
+### Ключевые Возможности
+
+- **Потоковая Обработка Событий**: Kafka как высокопроизводительный брокер сообщений
+- **Множественные Стратегии Хранения**: Data Lake (MinIO/S3) и аналитическая БД (ClickHouse)
+- **Реалистичная Генерация Событий**: Симуляция поведения пользователей с весовыми коэффициентами
+- **Мониторинг Качества Данных**: Встроенные утилиты валидации и проверки партиций
+
+---
+
+## 🏗️ Архитектура
+
+### Общая Схема Системы
+
+```mermaid
+flowchart LR
+    A["🎸 Генератор Событий<br/>(Музыкальное Приложение)"] -- Отправка событий --> B[("⚡ Kafka<br/>Брокер Сообщений")]
+    B -- Реал-тайм поток --> C["📊 Консьюмер 1<br/>(Аналитика)"]
+    B -- Реал-тайм поток --> D["💾 Консьюмер 2<br/>(Хранение)"]
+    B -- Реал-тайм поток --> E["🔍 Консьюмер N<br/>(Мониторинг)"]
+
+    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
+    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
+    style C fill:#95E1D3,stroke:#38A169,stroke-width:2px
+    style D fill:#95E1D3,stroke:#38A169,stroke-width:2px
+    style E fill:#A8DADC,stroke:#457B9D,stroke-width:2px
+```
+
+---
+
+## 🚀 Быстрый Старт
+
+### Требования
+
+- Python 3.12+
+- Docker & Docker Compose
+- Poetry (менеджер пакетов Python)
+
+### Установка
+
+#### 1️⃣ Создание Виртуального Окружения
 
 ```bash
 python3.12 -m venv venv && \
@@ -17,190 +56,158 @@ poetry lock && \
 poetry install
 ```
 
-#### Добавление новых зависимостей в окружение
+#### 2️⃣ Добавление Новых Зависимостей (Опционально)
 
 ```bash
-poetry lock && \
-poetry install
+poetry add <имя-пакета>
+poetry lock && poetry install
 ```
 
-### Поднятие инфраструктуры
+#### 3️⃣ Запуск Инфраструктуры
 
 ```bash
 docker compose up -d
 ```
 
-### Подключение к Minio
+### 🔐 Доступ к MinIO
 
-Параметры подключения стандартные:
+Параметры по умолчанию:
+- **Логин**: `minioadmin`
+- **Пароль**: `minioadmin`
+- **Консоль**: http://localhost:9001
 
-- `login`: `minioadmin`
-- `password`: `minioadmin`
+---
 
-## Kafka
+## 🎯 Основные Концепции
 
-Kafka – это брокер сообщений, который имеет принцип "*Write once read many (WORM)*".
+### Что Такое Kafka?
 
-Kafka верхнеуровнево:
+Kafka — это распределённая платформа потоковой передачи событий, следующая принципу **Write Once, Read Many (WORM)**. Она работает как центральная нервная система для data pipeline в реальном времени.
 
-```mermaid
-flowchart LR
-    A["Producer<br>(Отправитель)"] -- Отправляет сообщения --> B((Kafka<br>Topic))
-    B -- Сообщения поступают --> C["Consumer 1<br>(Получатель 1)"]
-    B -- Сообщения поступают --> D["Consumer 2<br>(Получатель 2)"]
-    B -- Сообщения поступают --> F["Consumer N<br>(Получатель N)"]
-
-    style A fill:#f9f,stroke:#333,stroke-width:1px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#afa,stroke:#333,stroke-width:1px
-    style D fill:#afa,stroke:#333,stroke-width:1px
-    style F fill:#aff,stroke:#333,stroke-width:1px
-```
-
-### Простой `producer`
-
-Запускаем [simple_producer.py](code/simple_producer.py)
-
-#### Просмотр сообщений
-
-Есть два варианта:
-
-- В [Kafka UI](http://localhost:8080/)
-- Через Kafka CLI
-
-Просмотр сообщений "_Без группы_":
-
-```bash
-docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic my_topic \
-  --from-beginning
-```
-
-Просмотр сообщений "_Только новые_":
-
-```bash
-docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic my_topic
-```
-
-Просмотр сообщений "_Новые не прочитанные_":
-
-```bash
-docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic my_topic \
-  --group mygroupcli
-```
-
-Прочитанные строки фиксируются в Kafka и мы можем это проверить командой:
-
-```bash
-docker exec -it kafka kafka-consumer-groups \
-  --bootstrap-server localhost:9092 \
-  --group mygroupcli \
-  --describe 
-```
-
-## Clickstream
-
-При запуске [simple_clickstream.py](code/simple_clickstream.py) эмулируется кликстрим музыкального сервиса.
-
-В Kafka topic отправляются события:
-
-| id | name_en                  | name_ru               |
-|----|--------------------------|-----------------------|
-| 1  | track_playback           | Воспроизведение трека |
-| 2  | pause_track              | Пауза трека           |
-| 3  | resume_track             | Возобновление трека   |
-| 4  | skipping_track_next      | Перелистывание вперёд |
-| 5  | skipping_track_prev      | Перелистывание назад  |
-| 6  | adding_track_to_playlist | Добавление в плейлист |
-| 7  | track_like               | Лайк трека            |
-| 8  | track_unlike             | Снятие лайка с трека  |
-
-С определённым "_весом_" выбирается то или иное событие. Вы можете это регулировать самостоятельно в функции
-`generate_realistic_event` в переменной `event_weights`.
-
-Далее выбирается один из пользователей, который генерируются в `generate_users_df` и отправляется уже в Kafka topic
-`music_events`.
-
-## Задача дата-инженера
-
-Собирать события для дальнейшей аналитики по сервису.
-
-### Просмотр сообщений
-
-Запускаем [simple_consumer.py](code/simple_consumer.py). Но нам этот вариант не подходит для работы, потому что он
-только читает сообщения, но не собирает их.
-
-### Сбор `events`
-
-Рассмотрим два способа сбора `events`:
-
-- Через Python + MinIO
-- Через ClickHouse
-
-#### Python + MinIO
-
-Запускаем [kafka_to_minio_parquet_on_python.py](code/kafka_to_minio_parquet_on_python.py). Логика простая: мы читаем
-топик `music_events` ждём "_отсечки_" по `BATCH_SIZE` и записываем данные в формате `.parquet` в нужно партицию.
-
-Kafka + Python + MinIO верхнеуровнево:
+### Фундаментальные Принципы Kafka
 
 ```mermaid
 flowchart TB
-    AA["Producer<br>(Отправитель)"] -- Отправляет сообщения --> A((Kafka<br>Topic))
-    A(("Kafka<br>Topic")) -- poll messages --> B["Python Consumer<br>(kafka_to_minio_parquet_on_python.py)"]
-    B -- batch (.json -> pd.DataFrame) --> C["Pandas DataFrame"]
-    C -- Save as .parquet --> D["MinIO<br>(S3 совместимое хранилище)"]
+    A["📱 Producer<br/>(Генератор Событий)"] -- Публикует --> B[("🔥 Kafka Topic<br/>'music_events'")]
+    B -- Подписка --> C["💻 Consumer 1<br/>(Python Приложение)"]
+    B -- Подписка --> D["🗄️ Consumer 2<br/>(ClickHouse)"]
+    B -- Подписка --> E["📈 Consumer 3<br/>(Аналитика)"]
 
-    style AA fill:#f9f,stroke:#333,stroke-width:1px
-    style A fill:#bbf,stroke:#333,stroke-width:2px
-    style B fill:#ffe599,stroke:#333,stroke-width:2px
-    style C fill:#b6d7a8,stroke:#333,stroke-width:2px
-    style D fill:#76a5af,stroke:#333,stroke-width:2px
+    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
+    style B fill:#FFD93D,stroke:#F77F00,stroke-width:4px,color:#000
+    style C fill:#6BCF7F,stroke:#2D6A4F,stroke-width:2px
+    style D fill:#6BCF7F,stroke:#2D6A4F,stroke-width:2px
+    style E fill:#70C1B3,stroke:#247BA0,stroke-width:2px
 ```
 
-##### Data quality
+---
 
-Для проверки качества данных, записанных в MinIO можно воспользоваться
-[check_count_partition_prod_python.py](code/check_count_partition_prod_python.py).
+## 🎵 Типы Событий
 
-Данный скрипт покажет:
+Система симулирует реалистичные события музыкального стриминга:
 
-1) Текущее количество строк в `bucket`
-2) Текущая "_плоская_" модель данных в `bucket`
-3) Первые десять (10) строк события `track_playback` (`1`)
+| ID | Название События          | Описание                  | Вес    |
+|----|---------------------------|---------------------------|--------|
+| 1  | `track_playback`          | Воспроизведение трека     | Высокий|
+| 2  | `pause_track`             | Пауза трека               | Средний|
+| 3  | `resume_track`            | Возобновление трека       | Средний|
+| 4  | `skipping_track_next`     | Перелистывание вперёд     | Средний|
+| 5  | `skipping_track_prev`     | Перелистывание назад      | Низкий |
+| 6  | `adding_track_to_playlist`| Добавление в плейлист     | Низкий |
+| 7  | `track_like`              | Лайк трека                | Средний|
+| 8  | `track_unlike`            | Снятие лайка с трека      | Низкий |
 
-#### ClickHouse
+---
 
-Kafka + ClickHouse верхнеуровнево:
+## 🧪 Запуск Проекта
+
+### 1️⃣ Простой Producer (Демо)
+
+Генерация базовых событий в Kafka:
+
+```bash
+python code/simple_producer.py
+```
+
+**Просмотр сообщений в Kafka UI**: http://localhost:8080/
+
+### 2️⃣ Генератор Событий Кликстрима
+
+Запуск реалистичной симуляции событий музыкального стриминга:
+
+```bash
+python code/simple_clickstream.py
+```
+
+Скрипт генерирует взвешенные события от симулированных пользователей в топик `music_events`.
+
+---
+
+## 📊 Стратегии Сбора Данных
+
+### Стратегия 1: Python + MinIO (Data Lake Подход)
 
 ```mermaid
 flowchart TB
-    A["Producer<br>(Отправитель)"] -- Отправляет сообщения --> B((Kafka<br>Topic))
-    B -- Сообщения поступают --> C["Таблица с движком Kafka<br>(consumer, логический)"]
-    C -- SELECT * FROM (Kafka) --> D["Материализованное<br>представление"]
-    D -- INSERT INTO --> E["Физическая таблица<br>(хранение данных)"]
+    A["🎵 Генератор Событий"] -- Публикует --> B[("⚡ Kafka<br/>Topic")]
+    B -- Читает сообщения --> C["🐍 Python Consumer<br/>(Batch Processor)"]
+    C -- Трансформирует --> D["🐼 Pandas DataFrame<br/>(В памяти)"]
+    D -- Записывает Parquet --> E["☁️ MinIO<br/>(S3 Data Lake)"]
 
-    style A fill:#f9f,stroke:#333,stroke-width:1px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#ffe599,stroke:#333,stroke-width:2px
-    style D fill:#b6d7a8,stroke:#333,stroke-width:2px
-    style E fill:#76a5af,stroke:#333,stroke-width:2px
+    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
+    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
+    style C fill:#FFD93D,stroke:#F77F00,stroke-width:3px,color:#000
+    style D fill:#95E1D3,stroke:#38A169,stroke-width:3px
+    style E fill:#5E60CE,stroke:#3C096C,stroke-width:3px,color:#fff
 ```
 
-Создаём необходимые сущности для чтения Kafka.
+**Запуск Python консьюмера**:
 
-> Ниже две модели, которые помогут прочитать топики: `music_events`, `my_topic` и сохранить данные.
+```bash
+python code/kafka_to_minio_parquet_on_python.py
+```
+
+**Особенности**:
+- Пакетная обработка с настраиваемым `BATCH_SIZE`
+- Автоматическое партиционирование (по дате)
+- Формат Parquet для эффективного хранения
+- Идемпотентная запись
+
+**Проверка Качества Данных**:
+
+```bash
+python code/check_count_partition_prod_python.py
+```
+
+Скрипт предоставляет:
+1. Общее количество строк в bucket
+2. Валидация схемы данных
+3. Инспекция образцов данных (первые 10 событий `track_playback`)
+
+---
+
+### Стратегия 2: ClickHouse (Реал-тайм Аналитика)
+
+```mermaid
+flowchart TB
+    A["🎵 Генератор Событий"] -- Публикует --> B[("⚡ Kafka Topic")]
+    B -- Потребляет --> C["🔄 Kafka Engine Таблица<br/>(Логический Consumer)"]
+    C -- SELECT * --> D["🎯 Materialized View<br/>(Слой Трансформации)"]
+    D -- INSERT INTO --> E["💾 MergeTree Таблица<br/>(Физическое Хранилище)"]
+
+    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
+    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
+    style C fill:#FFD93D,stroke:#F77F00,stroke-width:3px,color:#000
+    style D fill:#95E1D3,stroke:#38A169,stroke-width:3px
+    style E fill:#5E60CE,stroke:#3C096C,stroke-width:3px,color:#fff
+```
+
+#### Настройка ClickHouse
+
+**Для топика `my_topic` (простые события)**:
 
 ```sql
-DROP TABLE IF EXISTS kafka_simple_event_consumer;
-DROP TABLE IF EXISTS kafka_simple_event_phys_table;
-DROP TABLE IF EXISTS kafka_simple_event_mat_view;
-
+-- Таблица-консьюмер (логическая)
 CREATE TABLE kafka_simple_event_consumer
 (
     uuid String,
@@ -211,9 +218,10 @@ CREATE TABLE kafka_simple_event_consumer
 ) ENGINE = Kafka SETTINGS
     kafka_broker_list = 'kafka',
     kafka_topic_list = 'my_topic',
-    kafka_group_name = 'foo',
+    kafka_group_name = 'clickhouse_consumer',
     kafka_format = 'JSON';
-    
+
+-- Физическая таблица для хранения
 CREATE TABLE kafka_simple_event_phys_table
 (
     uuid String,
@@ -225,13 +233,16 @@ CREATE TABLE kafka_simple_event_phys_table
 ENGINE = MergeTree()
 ORDER BY (uuid);
 
-CREATE MATERIALIZED VIEW kafka_simple_event_mat_view TO kafka_simple_event_phys_table 
-    AS SELECT * FROM kafka_simple_event_consumer;
+-- Материализованное представление для автоматической загрузки
+CREATE MATERIALIZED VIEW kafka_simple_event_mat_view 
+TO kafka_simple_event_phys_table 
+AS SELECT * FROM kafka_simple_event_consumer;
+```
 
-DROP TABLE IF EXISTS kafka_music_event_consumer;
-DROP TABLE IF EXISTS kafka_music_event_phys_table;
-DROP TABLE IF EXISTS kafka_music_event_mat_view;
+**Для топика `music_events` (данные кликстрима)**:
 
+```sql
+-- Таблица-консьюмер
 CREATE TABLE kafka_music_event_consumer
 (
     event_params String,
@@ -239,36 +250,138 @@ CREATE TABLE kafka_music_event_consumer
 ) ENGINE = Kafka SETTINGS
     kafka_broker_list = 'kafka',
     kafka_topic_list = 'music_events',
-    kafka_group_name = 'foo',
+    kafka_group_name = 'clickhouse_music_consumer',
     kafka_format = 'JSON';
-    
+
+-- Физическое хранилище с автогенерацией UUID
 CREATE TABLE kafka_music_event_phys_table
 (
     event_params String,
     event_timestamp_ms String,
-    uuid UUID DEFAULT generateUUIDv4() 
+    uuid UUID DEFAULT generateUUIDv4()
 )
 ENGINE = MergeTree()
 ORDER BY (uuid);
 
-CREATE MATERIALIZED VIEW kafka_music_event_mat_view TO kafka_music_event_phys_table 
-    AS SELECT * FROM kafka_music_event_consumer;
+-- Материализованное представление
+CREATE MATERIALIZED VIEW kafka_music_event_mat_view 
+TO kafka_music_event_phys_table 
+AS SELECT * FROM kafka_music_event_consumer;
 ```
 
-Чтение данных из топика `my_topic` в ClickHouse:
+#### Примеры Запросов
 
-```sql
-SELECT * FROM kafka_simple_event_mat_view;
-```
-
-Чтение данных из топика `music_events` в ClickHouse:
-
+**Просмотр всех событий**:
 ```sql
 SELECT * FROM kafka_music_event_mat_view;
-
-SELECT * 
-FROM kafka_music_event_mat_view
-WHERE 1=1
-AND JSONExtractInt(event_params, 'event_type_id') = 1;
 ```
 
+**Фильтрация по событиям воспроизведения треков**:
+```sql
+SELECT 
+    JSONExtractString(event_params, 'user_id') AS user_id,
+    JSONExtractString(event_params, 'track_id') AS track_id,
+    event_timestamp_ms
+FROM kafka_music_event_mat_view
+WHERE JSONExtractInt(event_params, 'event_type_id') = 1
+ORDER BY event_timestamp_ms DESC
+LIMIT 100;
+```
+
+---
+
+## 🔍 Команды Kafka CLI
+
+### Просмотр Сообщений Без Consumer Group
+
+```bash
+docker exec -it kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic my_topic \
+  --from-beginning
+```
+
+### Просмотр Только Новых Сообщений
+
+```bash
+docker exec -it kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic my_topic
+```
+
+### Consumer Group с Управлением Оффсетами
+
+```bash
+docker exec -it kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic my_topic \
+  --group mygroupcli
+```
+
+### Проверка Статуса Consumer Group
+
+```bash
+docker exec -it kafka kafka-consumer-groups \
+  --bootstrap-server localhost:9092 \
+  --group mygroupcli \
+  --describe
+```
+
+---
+
+## 🛠️ Технологический Стек
+
+- **Брокер Сообщений**: Apache Kafka
+- **Обработка Данных**: Python 3.12, Pandas
+- **Объектное Хранилище**: MinIO (S3-совместимое)
+- **Аналитическая БД**: ClickHouse
+- **Оркестрация**: Docker Compose
+- **Управление Пакетами**: Poetry
+- **Формат Данных**: Parquet, JSON
+
+---
+
+## 📈 Варианты Использования
+
+Проект демонстрирует ключевые паттерны data engineering:
+
+1. **Event-Driven Архитектура**: Разделение продюсеров и консьюмеров
+2. **Lambda Архитектура**: Batch (MinIO) и speed (ClickHouse) слои
+3. **Дизайн Data Lake**: Партиционированное хранилище в object storage
+4. **Реал-тайм Аналитика**: Задержка запросов менее секунды с ClickHouse
+5. **Качество Данных**: Утилиты валидации и мониторинга
+
+---
+
+## 🎓 Результаты Обучения
+
+- Паттерны producer/consumer в Kafka
+- Проектирование event streaming архитектуры
+- Оптимизация формата Parquet
+- Материализованные представления ClickHouse
+- S3-совместимое объектное хранилище
+- Стратегии партиционирования данных
+- Компромиссы между реал-тайм и batch обработкой
+
+---
+
+## 🤝 Вклад в Проект
+
+Не стесняйтесь открывать issues или отправлять pull request'ы для улучшения проекта!
+
+---
+
+## 📄 Лицензия
+
+MIT License - используйте проект свободно для обучения и портфолио.
+
+---
+
+## 🔗 Полезные Ссылки
+
+- [Документация Apache Kafka](https://kafka.apache.org/documentation/)
+- [Документация ClickHouse](https://clickhouse.com/docs)
+- [Документация MinIO](https://min.io/docs/minio/linux/index.html)
+- [Kafka UI](http://localhost:8080/) (при локальном запуске)
+
+---
