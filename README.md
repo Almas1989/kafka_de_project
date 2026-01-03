@@ -26,11 +26,11 @@ flowchart LR
     B -- Реал-тайм поток --> D["💾 Консьюмер 2<br/>(Хранение)"]
     B -- Реал-тайм поток --> E["🔍 Консьюмер N<br/>(Мониторинг)"]
 
-    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
-    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
-    style C fill:#95E1D3,stroke:#38A169,stroke-width:2px
-    style D fill:#95E1D3,stroke:#38A169,stroke-width:2px
-    style E fill:#A8DADC,stroke:#457B9D,stroke-width:2px
+    style A fill:#2563eb,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#16a34a,stroke:#15803d,stroke-width:4px,color:#fff
+    style C fill:#0891b2,stroke:#0e7490,stroke-width:2px,color:#fff
+    style D fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style E fill:#dc2626,stroke:#b91c1c,stroke-width:2px,color:#fff
 ```
 
 ---
@@ -88,11 +88,11 @@ flowchart TB
     B -- Подписка --> D["🗄️ Consumer 2<br/>(ClickHouse)"]
     B -- Подписка --> E["📈 Consumer 3<br/>(Аналитика)"]
 
-    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
-    style B fill:#FFD93D,stroke:#F77F00,stroke-width:4px,color:#000
-    style C fill:#6BCF7F,stroke:#2D6A4F,stroke-width:2px
-    style D fill:#6BCF7F,stroke:#2D6A4F,stroke-width:2px
-    style E fill:#70C1B3,stroke:#247BA0,stroke-width:2px
+    style A fill:#2563eb,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#f59e0b,stroke:#d97706,stroke-width:4px,color:#fff
+    style C fill:#16a34a,stroke:#15803d,stroke-width:2px,color:#fff
+    style D fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style E fill:#0891b2,stroke:#0e7490,stroke-width:2px,color:#fff
 ```
 
 ---
@@ -149,11 +149,11 @@ flowchart TB
     C -- Трансформирует --> D["🐼 Pandas DataFrame<br/>(В памяти)"]
     D -- Записывает Parquet --> E["☁️ MinIO<br/>(S3 Data Lake)"]
 
-    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
-    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
-    style C fill:#FFD93D,stroke:#F77F00,stroke-width:3px,color:#000
-    style D fill:#95E1D3,stroke:#38A169,stroke-width:3px
-    style E fill:#5E60CE,stroke:#3C096C,stroke-width:3px,color:#fff
+    style A fill:#2563eb,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#16a34a,stroke:#15803d,stroke-width:4px,color:#fff
+    style C fill:#f59e0b,stroke:#d97706,stroke-width:3px,color:#fff
+    style D fill:#0891b2,stroke:#0e7490,stroke-width:3px,color:#fff
+    style E fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
 ```
 
 **Запуск Python консьюмера**:
@@ -190,11 +190,11 @@ flowchart TB
     C -- SELECT * --> D["🎯 Materialized View<br/>(Слой Трансформации)"]
     D -- INSERT INTO --> E["💾 MergeTree Таблица<br/>(Физическое Хранилище)"]
 
-    style A fill:#FF6B9D,stroke:#C91F5B,stroke-width:3px,color:#fff
-    style B fill:#4ECDC4,stroke:#1A7F7A,stroke-width:4px,color:#fff
-    style C fill:#FFD93D,stroke:#F77F00,stroke-width:3px,color:#000
-    style D fill:#95E1D3,stroke:#38A169,stroke-width:3px
-    style E fill:#5E60CE,stroke:#3C096C,stroke-width:3px,color:#fff
+    style A fill:#2563eb,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#16a34a,stroke:#15803d,stroke-width:4px,color:#fff
+    style C fill:#f59e0b,stroke:#d97706,stroke-width:3px,color:#fff
+    style D fill:#0891b2,stroke:#0e7490,stroke-width:3px,color:#fff
+    style E fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
 ```
 
 #### Настройка ClickHouse
