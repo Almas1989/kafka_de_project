@@ -58,7 +58,7 @@ def event_track_playback(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие воспроизведения трека.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 1,
@@ -83,7 +83,7 @@ def event_pause_track(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие паузы трека.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 2,
@@ -108,7 +108,7 @@ def event_resume_track(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие возобновления трека.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 3,
@@ -133,7 +133,7 @@ def event_skipping_track_next(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие пропуска трека вперед.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 4,
@@ -159,7 +159,7 @@ def event_skipping_track_prev(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие пропуска трека назад.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 5,
@@ -185,7 +185,7 @@ def event_adding_track_to_playlist(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие добавления трека в плейлист.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 6,
@@ -211,7 +211,7 @@ def event_track_like(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие лайка трека.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 7,
@@ -236,7 +236,7 @@ def event_track_unlike(user: pd.Series = None) -> dict[str, Any]:
     :param user: Словарь с информацией о пользователе.
     :return: Словарь, представляющий событие снятия лайка с трека.
     """
-    now = pendulum.now()
+    now = pendulum.now("UTC")
     return {
         "event_params": {
             "event_type_id": 8,

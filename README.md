@@ -289,11 +289,11 @@ LIMIT 100;
 
 ### Просмотр Сообщений Без Consumer Group
 
-```bash
+```powershell
 docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic my_topic \
-  --from-beginning
+--bootstrap-server localhost:9092 \ 
+--topic my_topic \
+--from-beginning
 ```
 
 ### Просмотр Только Новых Сообщений
