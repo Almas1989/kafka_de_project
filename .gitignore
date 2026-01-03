@@ -209,6 +209,6 @@ __marimo__/
 # Project
 data
 /poetry.lock
-/code/cred.py
+cred.py
 kafka_2.13-3.8.0.tgz
 kafka_2.13-3.8.0
