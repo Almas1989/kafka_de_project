@@ -45,9 +45,9 @@ flowchart LR
 
 #### 1️⃣ Создание Виртуального Окружения
 
-```bash
-python3.12 -m venv venv && \
-source venv/bin/activate && \
+```powershell
+py -m venv venv && \
+venv\Scripts\activate.ps1 && \
 pip install --upgrade pip && \
 pip install poetry && \
 poetry lock && \
