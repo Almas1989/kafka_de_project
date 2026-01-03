@@ -67,3 +67,15 @@ SELECT *
 FROM kafka_music_event_mat_view
 WHERE 1=1
 AND JSONExtractInt(event_params, 'event_type_id') = 1;
+
+
+
+--Фильтрация по событиям воспроизведения треков:
+SELECT 
+    JSONExtractString(event_params, 'user_id') AS user_id,
+    JSONExtractString(event_params, 'track_id') AS track_id,
+    event_timestamp_ms
+FROM kafka_music_event_mat_view
+WHERE JSONExtractInt(event_params, 'event_type_id') = 1
+ORDER BY event_timestamp_ms DESC
+LIMIT 100;
